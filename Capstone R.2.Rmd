@@ -1,0 +1,182 @@
+---
+title: "NYC Taxi Data"
+author: "Geoffrey Barry"
+date: "`r Sys.Date()`"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(scales)
+library(dplyr)
+library(readr)
+
+taxi_data <- read_csv("C:/Users/barry/OneDrive/Documents/2018  NYC TAXI DATA.csv")
+
+
+```
+
+```{r}
+
+head(taxi_data)
+summary_stats <- summary(taxi_data)
+summary_stats
+```
+```{r}
+count = c(250000, 500000, 1000000, 1048575)
+ggplot(taxi_data, aes(x = trip_distance)) +
+  geom_histogram(binwidth = 1, fill = "skyblue", color = "black") +
+  xlim(0, 20) +
+  scale_y_continuous(labels = scales::comma)
+  labs(title = "Trip Distance Distribution", x = "Distance (miles)", y = "Count")
+
+```
+
+```{r}
+pickup_data <- taxi_data %>%
+  group_by(pickup_location_id) %>%
+  summarize(avg_distance = mean(trip_distance))
+```
+
+```{r}
+ggplot(pickup_data, aes(x = pickup_location_id, y = avg_distance, color = "red")) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Average Distance by Pickup ID",
+       x = "Pickup ID", 
+       y = "Average Distance") +
+  theme_minimal()
+```
+
+```{r}
+dropoff_data <- taxi_data %>%
+  group_by(dropoff_location_id) %>%
+  summarize(avg_distance = mean(trip_distance))
+```
+
+```{r}
+ggplot(dropoff_data, aes(x = dropoff_location_id, y = avg_distance, color = "red")) +
+  geom_line() +
+  geom_point() +
+  labs(title = "Average Distance by Dropoff ID",
+       x = "Dropoff ID", 
+       y = "Average Distance") +
+  theme_minimal()
+```
+
+```{r}
+count = c(250000, 500000, 1000000, 1048575)
+ggplot(taxi_data, aes(x = pickup_location_id)) +
+  geom_bar(binwidth = 1, fill = "yellow", color = "black") +
+  xlim(1, 265) +
+  scale_y_continuous(labels = scales::comma)
+  labs(title = "Pickup Location Distribution", x = "Pickup ID", y = "Count")
+```
+
+```{r}
+count = c(250000, 500000, 1000000, 1048575)
+ggplot(taxi_data, aes(x = dropoff_location_id)) +
+  geom_bar(binwidth = 1, fill = "yellow", color = "black") +
+  xlim(1, 265) +
+  scale_y_continuous(labels = scales::comma)
+  labs(title = "Dropoff Location Distribution", x = "Dropoff ID", y = "Count")
+```
+
+```{r}
+taxi_data <- taxi_data %>%
+  mutate(region = case_when(
+    pickup_location_id %in% c(3,18,20,31,32,46,47,51,58,59,69,78,81,94,119,126,136,147,159,167,168,169,174,182,183,184,185,199,200,208,212,213,220,235,240,241,242,247,248,250,254,259) ~ "Bronx",
+    pickup_location_id %in% c(2,7,8,9,10,15,16,19,27,28,30,38,53,56,64,70,73,82,83,86,92,93,95,96,98,101,102,117,121,122,124,129,130,131,132,134,135,138,139,145,146,157,160,171,173,175,179,180,191,192,193,196,197,198,201,203,205,207,215,216,218,219,223,226,252,253,258,260) ~ "Queens",
+    pickup_location_id %in% c(4,12,13,24,41,42,43,45,48,50,68,74,75,79,87,88,90,100,103,107,113,114,116,120,125,127,128,137,140,141,142,143,144,148,151,152,153,158,161,162,163,164,166,170,186,194,202,209,211,224,229,230,231,232,233,234,236,237,238,239,243,244,246,249,261,262,263) ~ "Manhattan",
+    pickup_location_id %in%
+c(11,14,17,21,22,25,26,29,33,34,35,36,37,39,40,49,52,54,55,61,62,63,65,66,67,71,72,76,77,80,85,89,91,97,106,108,111,112,123,133,149,150,154,155,165,177,178,181,188,189,190,195,210,217,222,225,227,228,255,256,257) ~ "Brooklyn",
+  pickup_location_id %in%
+c(5,6,23,44,84,99,109,110,115,118,156,172,176,187,204,206,214,221,245,251) ~ "Staten Island"
+  ))
+
+```
+
+```{r}
+ggplot(taxi_data, aes(x = region)) +
+  geom_bar(fill = "steelblue") +
+  scale_y_continuous(labels = comma) +
+  labs(
+    title = "Number of Trips by Region",
+    x = "Region",
+    y = "Trip Count"
+  ) +
+  theme_minimal()
+
+
+```
+
+```{r}
+taxi_data <- taxi_data %>%
+  mutate(
+    day_of_week = factor(day_of_week,
+                         levels = 0:6,
+                         labels = c("Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"))
+  )
+
+```
+
+```{r}
+region_summary <- taxi_data %>%
+  group_by(region) %>%
+  summarise(
+    avg_trip_distance = mean(trip_distance, na.rm = TRUE),
+    avg_total_amount = mean(total_amount, na.rm = TRUE),
+    most_common_day = names(sort(table(day_of_week), decreasing = TRUE))[1],
+    most_common_hour = as.integer(names(sort(table(hour_of_day), decreasing = TRUE))[1]),
+    trip_count = n()
+  )
+
+print(region_summary)
+
+```
+
+```{r}
+library(plotly)
+
+# Basic plotly bar chart
+region_counts <- taxi_data %>%
+  count(region)
+
+plot_ly(
+  data = region_counts,
+  x = ~region,
+  y = ~n,
+  type = "bar",
+  text = ~paste("Trips:", n),
+  hoverinfo = "text",
+  marker = list(color = 'steelblue')
+) %>%
+  layout(
+    title = "Number of Trips by Region",
+    xaxis = list(title = "Region"),
+    yaxis = list(title = "Trip Count", tickformat = ",")  # comma format numbers
+  )
+
+```
+
+```{r}
+pickup_grid <- taxi_data %>%
+  count(day_of_week, hour_of_day)
+
+ggplot(pickup_grid, aes(x = hour_of_day, y = day_of_week, fill = n)) +
+  geom_tile(color = "white") +
+  scale_fill_viridis_c(option = "C") +
+  labs(
+    title = "NYC Taxi Pickups by Hour and Day",
+    x = "Hour of Day",
+    y = "Day of Week",
+    fill = "Pickup Count"
+  ) +
+  theme_minimal()
+
+
+```
+
