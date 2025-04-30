@@ -180,3 +180,248 @@ ggplot(pickup_grid, aes(x = hour_of_day, y = day_of_week, fill = n)) +
 
 ```
 
+```{r}
+two_group_data <- taxi_data %>%
+  filter(region %in% c("Bronx", "Manhattan"))
+
+t.test(trip_distance ~ region, data = two_group_data)
+
+
+```
+
+```{r}
+two_group_data <- taxi_data %>%
+  filter(region %in% c("Bronx", "Queens"))
+
+t.test(trip_distance ~ region, data = two_group_data)
+```
+
+```{r}
+two_group_data <- taxi_data %>%
+  filter(region %in% c("Bronx", "Queens"))
+
+t.test(total_amount ~ region, data = two_group_data)
+```
+
+```{r}
+two_group_data <- taxi_data %>%
+  filter(region %in% c("Bronx", "Manhattan"))
+
+t.test(total_amount ~ region, data = two_group_data)
+```
+
+
+```{r}
+anova_result <- aov(trip_distance ~ region, data = taxi_data)
+summary(anova_result)
+
+```
+
+```{r}
+TukeyHSD(anova_result)
+
+```
+
+```{r}
+aov_model <- aov(trip_distance ~ region, data = taxi_data)
+tukey_result <- TukeyHSD(aov_model)
+
+tukey_df <- as.data.frame(tukey_result$region)
+tukey_df$comparison <- rownames(tukey_result$region)
+
+library(ggplot2)
+
+ggplot(tukey_df, aes(x = diff, y = reorder(comparison, diff))) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = lwr, xmax = upr), height = 0.2) +
+  labs(title = "Tukey HSD: Trip Distance by Region",
+       x = "Difference in Means",
+       y = "Region Comparison") +
+  theme_minimal(base_size = 12)
+
+
+```
+
+```{r}
+anova_result_1 <- aov(total_amount ~ region, data = taxi_data)
+summary(anova_result)
+```
+
+```{r}
+TukeyHSD(anova_result_1)
+```
+
+```{r}
+aov_model <- aov(total_amount ~ region, data = taxi_data)
+tukey_result <- TukeyHSD(aov_model)
+
+tukey_df <- as.data.frame(tukey_result$region)
+tukey_df$comparison <- rownames(tukey_result$region)
+
+library(ggplot2)
+
+ggplot(tukey_df, aes(x = diff, y = reorder(comparison, diff))) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = lwr, xmax = upr), height = 0.2) +
+  labs(title = "Tukey HSD: Pairwise Differences by Region",
+       x = "Difference in Means",
+       y = "Region Comparison") +
+  theme_minimal(base_size = 12)
+
+```
+
+
+```{r}
+model <- lm(total_amount ~ trip_distance + region, data = taxi_data)
+summary(model)
+
+```
+
+```{r}
+library(ggplot2)
+
+clean_data <- na.omit(taxi_data)
+
+model <- lm(total_amount ~ trip_distance + region, data = clean_data)
+
+clean_data$predicted_total <- predict(model)
+
+filtered_data <- clean_data[clean_data$total_amount <= 150, ]
+
+ggplot(filtered_data, aes(x = predicted_total, y = total_amount)) +
+  geom_point(alpha = 0.3, color = "steelblue") +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+  labs(title = "Predicted vs Actual Total Fare (Capped at $150)",
+       x = "Predicted Fare",
+       y = "Actual Fare") +
+  theme_minimal()
+
+
+
+
+```
+
+
+```{r}
+chisq.test(table(taxi_data$region, taxi_data$day_of_week))
+
+```
+
+```{r}
+library(ggplot2)
+library(patchwork)
+
+clean_data <- na.omit(taxi_data)
+
+regions <- unique(clean_data$region)
+
+plot_list <- list()
+
+for (r in regions) {
+  
+  region_data <- subset(clean_data, region == r)
+  
+  model <- lm(total_amount ~ trip_distance, data = region_data)
+  
+  region_data$predicted_total <- predict(model)
+  
+  filtered_data <- subset(region_data, total_amount <= 150)
+  
+  p <- ggplot(filtered_data, aes(x = predicted_total, y = total_amount)) +
+    geom_point(alpha = 0.3, color = "steelblue") +
+    geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+    labs(title = paste("Predicted vs Actual Fare:", r),
+         x = "Predicted Fare",
+         y = "Actual Fare") +
+    coord_cartesian(xlim = c(0, 150), ylim = c(0, 150)) +
+    theme_minimal(base_size = 12)
+  
+  plot_list[[r]] <- p
+}
+
+wrap_plots(plot_list, ncol = 2)
+
+
+```
+
+```{r}
+library(ggplot2)
+library(patchwork)
+
+clean_data <- na.omit(taxi_data)
+
+regions <- unique(clean_data$region)
+
+distance_plots <- list()
+
+for (r in regions) {
+  
+  region_data <- subset(clean_data, region == r)
+  
+  model <- lm(trip_distance ~ total_amount, data = region_data)
+  
+  region_data$predicted_distance <- predict(model)
+  
+  filtered_data <- subset(region_data, trip_distance <= 60)
+
+  p <- ggplot(filtered_data, aes(x = predicted_distance, y = trip_distance)) +
+    geom_point(alpha = 0.3, color = "darkgreen") +
+    geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed") +
+    labs(title = paste("Predicted vs Actual Distance:", r),
+         x = "Predicted",
+         y = "Actual") +
+    coord_cartesian(xlim = c(0, 60), ylim = c(0, 60)) +
+    theme_minimal(base_size = 12)
+  
+  distance_plots[[r]] <- p
+}
+
+wrap_plots(distance_plots, ncol = 2)
+
+```
+
+```{r}
+clean_data <- na.omit(taxi_data)
+
+bronx_data <- clean_data[clean_data$region == "Bronx" & clean_data$total_amount <= 150, ]
+
+bronx_poly_model <- lm(total_amount ~ poly(trip_distance, 2, raw = TRUE), data = bronx_data)
+
+bronx_data$predicted_total_poly <- predict(bronx_poly_model)
+
+ggplot(bronx_data, aes(x = trip_distance, y = total_amount)) +
+  geom_point(alpha = 0.3, color = "steelblue") +
+  geom_line(aes(y = predicted_total_poly), color = "red", linewidth = 1.2) +
+  labs(title = "Polynomial Regression: Fare vs Trip Distance (Bronx Only)",
+       x = "Trip Distance (miles)",
+       y = "Total Fare ($)") +
+  theme_minimal() +
+  coord_cartesian(xlim = c(0, 30), ylim = c(0, 150))
+
+```
+
+```{r}
+summary(bronx_poly_model)
+
+```
+
+```{r}
+clean_data <- na.omit(taxi_data)
+
+filtered_data <- clean_data[clean_data$total_amount <= 150, ]
+
+poly_model <- lm(total_amount ~ poly(trip_distance, 2, raw = TRUE), data = filtered_data)
+
+filtered_data$predicted_total_poly <- predict(poly_model)
+
+ggplot(filtered_data, aes(x = trip_distance, y = total_amount)) +
+  geom_point(alpha = 0.3, color = "steelblue") +
+  geom_line(aes(y = predicted_total_poly), color = "red", linewidth = 1.2) +
+  labs(title = "Polynomial Regression: Fare vs Trip Distance",
+       x = "Trip Distance (miles)",
+       y = "Total Fare ($)") +
+  theme_minimal() +
+  coord_cartesian(xlim = c(0, 30), ylim = c(0, 150))
+
+```
+
