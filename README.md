@@ -1,25 +1,25 @@
 # Identifying and Addressing Transit Deserts in the Bronx
-**DAT 490 Capstone Project — Arizona State University**  
+**DAT 490 Capstone Project Arizona State University**  
 David Bonsaver, Geoffrey Barry, Andrew Nagle | May 2025
 
 ---
 
 ## Overview
 
-New York City's public transit system is among the most extensive in the world — but its coverage is not equitable. This project uses large-scale taxi trip data, geospatial analysis, and socioeconomic clustering to identify where transit demand is unmet, with a focus on the Bronx as a case study in structural underservice.
+New York City's public transit system is among the most extensive in the world but its coverage is not equitable. This project uses large-scale taxi trip data, geospatial analysis, and socioeconomic clustering to identify where transit demand is unmet, with a focus on the Bronx as a case study in structural underservice.
 
 The core question: **Can data science tell us where to build transit, and whether building it is economically justifiable?**
 
-Our answer: yes to the first, and sobering on the second.
+Our answer: yes to the first, and no on the second.
 
 ---
 
 ## Key Findings
 
-- **The Bronx is measurably underserved.** Welch's t-tests and ANOVA confirmed that Bronx-originating taxi trips are fewer, longer, and more expensive relative to Manhattan and Queens — consistent with riders substituting taxi for transit that doesn't exist.
-- **Geographic barriers, not just distance, drive taxi demand.** Spatial flow analysis revealed that the Harlem River crossing is the dominant structural bottleneck shaping Bronx trip patterns — trips cluster around a small number of bridge crossings rather than distributing across the borough.
+- **The Bronx is measurably underserved.** Welch's t-tests and ANOVA confirmed that Bronx-originating taxi trips are fewer, longer, and more expensive relative to Manhattan and Queens consistant with riders substituting taxi for transit that doesn't exist.
+- **Geographic barriers, not just distance, drive taxi demand.** Spatial flow analysis revealed that the Harlem River crossing is the dominant structural bottleneck shaping Bronx trip patterns trips cluster around a small number of bridge crossings rather than distributing across the borough.
 - **The Bronx concentrates disadvantage.** K-Means clustering across eight socioeconomic indicators (rent burden, educational attainment, disability rates, internet access, and others) identified the Bronx as the borough most concentrated with high-need census tracts. A logistic regression model predicting DAC designation achieved McFadden's R² = 0.541, with renter percentage, COPD rates, and education level as primary predictors.
-- **Subway expansion is not economically viable on fare savings alone.** Cost-benefit modeling of three construction scenarios (full loop, mini loop, lateral-only) showed subway payback periods of 100–340 years. Light rail payback periods ranged from 9–68 years depending on assumptions — far more viable, though the optimistic end requires scrutiny.
+- **Subway expansion is not economically viable on fare savings alone.** Cost-benefit modeling of three construction scenarios (full loop, mini loop, lateral-only) showed subway payback periods of 100–340 years. Light rail payback periods ranged from 9–68 years depending on assumptions far more viable, though the optimistic end requires scrutiny.
 - **The realistic path forward is multimodal.** Bus rapid transit, demand-responsive microtransit, and services like Dollaride's CTAP program represent more tractable near-term interventions than capital-intensive rail.
 
 ---
@@ -28,15 +28,15 @@ Our answer: yes to the first, and sobering on the second.
 
 ### Trip Flow Out of the Bronx (>350 trips, dropoff outside Bronx)
 ![Bronx outbound flows](maps/kepler_bronx_only_and_more_than_350_trips_and_dropoff_outside_bronx.png)
-*Long-distance trips from the Bronx converge on NYC airports (LaGuardia, JFK) — evidence of taxi dependency for airport access due to absent direct transit links.*
+*Long-distance trips from the Bronx converge on NYC airports (LaGuardia, JFK) evidence of taxi dependency for airport access due to absent direct transit links.*
 
 ### Trip Flow Into the Bronx (>1,632 trips)
 ![Bronx inbound flows](maps/Kepler_bronx_only_more_than_1632_trips_ending_at_the_bronx.png)
-*High-volume inbound trips cluster along the western edge of the Bronx, crossing the Harlem River via a small number of bridges. Trips are not distributed — they are bottlenecked.*
+*High-volume inbound trips cluster along the western edge of the Bronx, crossing the Harlem River via a small number of bridges. Trips are not distributed they are bottlenecked.*
 
 ### KDTree Demand Clusters
 ![KDTree clusters](maps/Kepler_map_KDTreeclusters.html)  
-*Interactive map — open in browser*
+*Interactive map open in browser*
 
 **[→ View all interactive Kepler maps](maps/)**
 
@@ -131,4 +131,4 @@ Raw trip data files are not included in this repository due to size. They can be
 
 ## Full Report
 
-The complete capstone paper — including statistical results, cost-benefit tables, and policy discussion — is available in [`reports/Final_draft.pdf`](reports/Final_draft.pdf).
+The complete capstone paper including statistical results, cost-benefit tables, and policy discussion is available in [`reports/Final_draft.pdf`](reports/Final_draft.pdf).
