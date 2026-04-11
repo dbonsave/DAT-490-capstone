@@ -10,7 +10,7 @@ New York City's public transit system is among the most extensive in the world b
 
 The core question: **Can data science tell us where to build transit, and whether building it is economically justifiable?**
 
-Our answer: yes to the first, and no on the second.
+Our answer: yes to the first, and sobering on the second.
 
 ---
 
