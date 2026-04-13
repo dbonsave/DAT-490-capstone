@@ -34,11 +34,7 @@ Our answer: yes to the first, and sobering on the second.
 ![Bronx inbound flows](maps/kepler_bronx_only_more_than_1632_trips_ending_at_the_bronx.png)
 *High-volume inbound trips cluster along the western edge of the Bronx, crossing the Harlem River via a small number of bridges. Trips are not distributed they are bottlenecked.*
 
-### KDTree Demand Clusters
-![KDTree clusters](maps/kepler_map_KDTreeclusters.html)  
-*Interactive map open in browser*
 
-**[→ View all interactive Kepler maps](maps/)**
 
 ---
 
